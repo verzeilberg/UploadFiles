@@ -76,7 +76,6 @@ return [
             'doc',
             'docx'
         ],
-        //'rootPath' => dirname(__DIR__) . '/../../public/img/userFiles'
         'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
     ],
     'asset_manager' => [
