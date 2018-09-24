@@ -72,7 +72,7 @@ return [
     'filesUploadSettings' => [
         'uploadFolder' => 'files/userFiles/files/',
         'uploadeFileSize' => '5000000000000000',
-        'allowedFileExtensionss' => [
+        'allowedFileExtensions' => [
             'doc',
             'docx'
         ],
