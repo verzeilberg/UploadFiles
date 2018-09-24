@@ -57,8 +57,8 @@ class uploadfilesService implements uploadfilesServiceInterface {
 
         if ($aAllowedExtensions != NULL) {
             //Check if the file is allowed by the module
-            if (!in_array($this->sMimeType, $aAllowedExtensions)) {
-                return 'File extension not allowed2';
+            if (!in_array($this->mimeType, $aAllowedExtensions)) {
+                return 'File extension not allowed';
             }
         }
         
@@ -92,10 +92,11 @@ class uploadfilesService implements uploadfilesServiceInterface {
 
         $sPathParts = pathinfo($this->sPathToFile);
         
+        $sUnique = ''; //addition for making filename unique
         if ($bAllowCopy === false) {
             # make unique filename
             $iT = 1; //counter for making unique addition
-            $sUnique = ''; //addition for making filename unique
+            
             while (file_exists($sDestinationFolder . "/" . $sPathParts['filename'] . $sUnique . '.' . $sPathParts['extension'])) {
                 $sUnique = '(' . $iT . ')';
                 $iT++;
