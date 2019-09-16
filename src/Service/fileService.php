@@ -19,11 +19,13 @@ class fileService implements fileServiceInterface {
 
     public function uploadFile($aFile, $bAllowCopy = false) {
 
-        $sDestinationFolder = 'public/files/userFiles/files/';
+        $sDestinationFolder = 'data/files/';
         $iMaxFileSize = (int) 5000000000000000;
         $aAllowedExtensions = [
-            'image/jpeg'
+            'text/xml'
         ];
+
+
 
         //Put file array in variables
         $this->mimeType = $aFile['type']; //file type
@@ -35,15 +37,6 @@ class fileService implements fileServiceInterface {
         if ($this->iErrorNr <> 0) {
             return "Return Code: " . $this->iErrorNr . "<br>";
         }
-
-//
-//        //Check if the file is allowed by CMS        
-//        if (!array_search($this->sMimeType, MimeTypesExtensions::getAllAllowedMimeTyesExtension($this->sMimeType))) {
-//
-//            $sStatusMessage = 'File extension not allowed';
-//            echo $sStatusMessage;
-//            exit;
-//        }
 
         if ($aAllowedExtensions != NULL) {
             //Check if the file is allowed by the module
