@@ -19,12 +19,11 @@ class fileService implements fileServiceInterface {
 
     public function uploadFile($aFile, $bAllowCopy = false) {
 
-
-        $sDestinationFolder = 'public/' . $this->config['filesUploadSettings']['uploadFolder'];
-        $iMaxFileSize = (int) $this->config['filesUploadSettings']['uploadeFileSize'];
-        $aAllowedExtensions = array();
-        $aAllowedExtensions = $this->config['imageUploadSettings']['allowedFileExtensions'];
-
+        $sDestinationFolder = 'public/files/userFiles/files/';
+        $iMaxFileSize = (int) 5000000000000000;
+        $aAllowedExtensions = [
+            'image/jpeg'
+        ];
 
         //Put file array in variables
         $this->mimeType = $aFile['type']; //file type
@@ -48,8 +47,8 @@ class fileService implements fileServiceInterface {
 
         if ($aAllowedExtensions != NULL) {
             //Check if the file is allowed by the module
-            if (!in_array($this->sMimeType, $aAllowedExtensions)) {
-                return 'File extension not allowed2';
+            if (!in_array($this->mimeType, $aAllowedExtensions)) {
+                return 'File extension not allowed';
             }
         }
 
@@ -94,7 +93,7 @@ class fileService implements fileServiceInterface {
         move_uploaded_file($this->sTempFileName, $this->sPathToFile);
 
 
-        return 'File uploaded';
+        return true;
     }
 
     /**

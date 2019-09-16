@@ -10,7 +10,7 @@ interface fileServiceInterface {
      * @return 
      * 
      */
-    public function uploadFile($image, $imageUploadSettings = NULL, $imageType = 'original', $Image = NULL, $isOriginal = 0);
+    public function uploadFile($aFile, $bAllowCopy = false);
 
 
 }
