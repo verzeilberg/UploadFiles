@@ -2,13 +2,14 @@
 
 namespace UploadFiles\Entity;
 
+use Zend\Form\Annotation;
 use Doctrine\ORM\Mapping as ORM;
 use Application\Model\UnityOfWork;
 
 /**
  * This class represents a uploadfiles item.
  * @ORM\Entity()
- * @ORM\Table(name="files")
+ * @ORM\Table(name="file")
  */
 class UploadFiles extends UnityOfWork {
 
