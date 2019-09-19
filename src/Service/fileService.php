@@ -8,89 +8,92 @@ class fileService implements fileServiceInterface {
 
     protected $config;
     protected $mimeType;
-    protected $sFileName;
-    protected $sTempFileName;
-    protected $iErrorNr;
-    protected $iFileSize;
+    protected $fileName;
+    protected $tempFileName;
+    protected $errorNr;
+    protected $fileSize;
 
     public function __construct($config) {
         $this->config = $config;
     }
 
-    public function uploadFile($aFile, $bAllowCopy = false) {
+    /**
+     * Funtion to upload files
+     * @param array $file file array of a post
+     * @param boolean $allowCopy fals or true. Set to true when overiding the file with same name
+     * @param string $settings settings to use to upload the file
+     *
+     * @return string or array
+     */
+    public function uploadFile($file, $allowCopy = false, $settings = 'default') {
 
-        $sDestinationFolder = 'data/files/';
-        $iMaxFileSize = (int) 5000000000000000;
-        $aAllowedExtensions = [
-            'text/xml'
-        ];
-
-
+        //Set settings in variables
+        $destinationFolder = $this->config['filesUploadSettings'][$settings]['uploadFolder'];
+        $maxFileSize = (int) $this->config['filesUploadSettings'][$settings]['uploadeFileSize'];
+        $allowedExtensions = $this->config['filesUploadSettings'][$settings]['allowedFileExtensions'];
 
         //Put file array in variables
-        $this->mimeType = $aFile['type']; //file type
-        $this->sFileName = $aFile['name']; //file name
-        $this->sTempFileName = $aFile['tmp_name']; //temporary file name
-        $this->iErrorNr = $aFile['error']; //error number
-        $this->iFileSize = $aFile['size']; //file size
+        $this->mimeType = $file['type']; //file type
+        $this->fileName = $file['name']; //file name
+        $this->tempFileName = $file['tmp_name']; //temporary file name
+        $this->errorNr = $file['error']; //error number
+        $this->fileSize = $file['size']; //file size
         //Check if there is a error in the file
-        if ($this->iErrorNr <> 0) {
-            return "Return Code: " . $this->iErrorNr . "<br>";
+        if ($this->errorNr <> 0) {
+            return "Return Code: " . $this->errorNr . "<br>";
         }
-
-        if ($aAllowedExtensions != NULL) {
-            //Check if the file is allowed by the module
-            if (!in_array($this->mimeType, $aAllowedExtensions)) {
+        //Check if the mime type of the file is allowed by the settings array
+        if ($allowedExtensions != NULL) {
+            //Check if the file is allowed
+            if (!in_array($this->mimeType, $allowedExtensions)) {
                 return 'File extension not allowed';
             }
         }
-
         // Check if the directory exist
-        if (!is_dir($sDestinationFolder)) {
-            return 'Folder ' . $sDestinationFolder . ' does not exist';
+        if (!is_dir($destinationFolder)) {
+            return 'Folder ' . $destinationFolder . ' does not exist';
         }
-
         // Check if the directory has the appropiate rights
-        if (substr(sprintf('%o', fileperms($sDestinationFolder)), -4) <> '0777') {
+        if (substr(sprintf('%o', fileperms($destinationFolder)), -4) <> '0777') {
             return 'The folder does not has the appropirate rights to upload files.';
         }
-
-        // Check is the file size is not to big Smaller than 50 mb
-        // File size can be set in incl/config.php file
-        if ($this->iFileSize > $iMaxFileSize) {
+        // Check is the file size is not to big
+        if ($this->fileSize > $maxFileSize) {
             return 'The file size is to big.';
         }
-
-        //convert file name to smal letters                    
-        $this->sFileName = $this->friendlyFileURL($this->sFileName);
-
+        //Convert file name to smal and friendly letters
+        $this->fileName = $this->friendlyFileURL($this->fileName);
         //Set the file folder
-        $this->sPathToFile = $sDestinationFolder . "/" . $this->sFileName;
-
-        $sPathParts = pathinfo($this->sPathToFile);
-
-        if ($bAllowCopy === false) {
+        $this->pathToFile = $destinationFolder . "/" . $this->fileName;
+        //Get the path parts and set them into a array
+        $pathParts = pathinfo($this->pathToFile);
+        //Check if allow copy is false. When false the file will be uploaded with a unique name
+        if ($allowCopy === false) {
             # make unique filename
-            $iT = 1; //counter for making unique addition
-            $sUnique = ''; //addition for making filename unique
-            while (file_exists($sDestinationFolder . "/" . $sPathParts['filename'] . $sUnique . '.' . $sPathParts['extension'])) {
-                $sUnique = '(' . $iT . ')';
-                $iT++;
+            $addition = 1; //counter for making unique addition
+            $uniqueFileName = ''; //addition for making filename unique
+            while (file_exists($destinationFolder . "/" . $pathParts['filename'] . $uniqueFileName . '.' . $pathParts['extension'])) {
+                $uniqueFileName = '(' . $addition . ')';
+                $addition++;
             }
         }
-
-        $this->sFileName = $sPathParts['filename'] . $sUnique . '.' . $sPathParts['extension'];
-
-        $this->sPathToFile = $sDestinationFolder . "/" . $this->sFileName;
-
-        move_uploaded_file($this->sTempFileName, $this->sPathToFile);
-
-
-        return true;
+        //Create filename
+        $this->fileName = $pathParts['filename'] . $uniqueFileName . '.' . $pathParts['extension'];
+        //Create path (including file name)
+        $this->pathToFile = $destinationFolder . "/" . $this->fileName;
+        //Upload file to server
+        move_uploaded_file($this->tempFileName, $this->pathToFile);
+        //Return array
+        return [
+            'path' => $this->pathToFile,
+            'name' => $pathParts['filename'],
+            'type' => $pathParts['filename']
+        ];
     }
 
     /**
      * Return a friendly url
+     * @param string $string
      * @return String
      */
     public function friendlyFileURL($string) {
@@ -106,6 +109,9 @@ class fileService implements fileServiceInterface {
         return strtolower($string);
     }
 
+    /*
+     * When having a excisting form you can add a file input
+     */
     public function addFileInputToForm($form, $inputName = 'fileUpload', $labelName = 'File') {
         $form->add([
             'name' => $inputName,
@@ -119,6 +125,22 @@ class fileService implements fileServiceInterface {
         ]);
         
         return $form;
+    }
+
+    /**
+     * Remove file from server
+     * @param $path string path to file
+     *
+     * @return boolean
+     */
+    public function removeFile($path)
+    {
+        if (file_exists($path)) {
+            @unlink($path);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

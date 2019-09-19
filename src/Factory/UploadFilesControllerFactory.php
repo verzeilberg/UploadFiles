@@ -8,7 +8,7 @@ use UploadFiles\Controller\UploadFilesController;
 use UploadFiles\Service\uploadfilesService;
 
 /**
- * This is the factory for AuthController. Its purpose is to instantiate the controller
+ * This is the factory for the UploadFilesController. Its purpose is to instantiate the controller
  * and inject dependencies into its constructor.
  */
 class UploadFilesControllerFactory implements FactoryInterface {

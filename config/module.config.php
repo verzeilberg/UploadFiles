@@ -70,13 +70,11 @@ return [
         ]
     ],
     'filesUploadSettings' => [
-        'uploadFolder' => 'files/userFiles/files/',
-        'uploadeFileSize' => '5000000000000000',
-        'allowedFileExtensions' => [
-            'doc',
-            'docx'
-        ],
-        'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
+        'default' => [
+            'uploadFolder' => '',
+            'uploadeFileSize' => '',
+            'allowedFileExtensions' => [],
+        ]
     ],
     'asset_manager' => [
         'resolver_configs' => [
@@ -87,14 +85,14 @@ return [
     ],
     'doctrine' => [
         'driver' => [
-            __NAMESPACE__.'_driver' => [
+            __NAMESPACE__ . '_driver' => [
                 'class' => AnnotationDriver::class,
                 'cache' => 'array',
-                'paths' => [__DIR__.'/../src/Entity'],
+                'paths' => [__DIR__ . '/../src/Entity'],
             ],
             'orm_default' => [
                 'drivers' => [
-                    __NAMESPACE__.'\Entity' => __NAMESPACE__.'_driver',
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver',
                 ],
             ],
         ],
