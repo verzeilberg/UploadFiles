@@ -2,7 +2,7 @@
 
 namespace UploadFiles\Service;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class fileService implements fileServiceInterface {
 

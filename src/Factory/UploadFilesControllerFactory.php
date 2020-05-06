@@ -3,7 +3,7 @@
 namespace UploadFiles\Factory;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use UploadFiles\Controller\UploadFilesController;
 use UploadFiles\Service\uploadfilesService;
 
