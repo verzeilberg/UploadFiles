@@ -6,6 +6,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Symfony\Component\VarDumper\VarDumper;
+use UploadFiles\Exception\fileException;
 
 class UploadFilesAjaxController extends AbstractActionController {
 
@@ -19,12 +20,26 @@ class UploadFilesAjaxController extends AbstractActionController {
         $this->uploadfilesService = $uploadfilesService;
     }
 
-    public function addAction() {
+    /**
+     * @return array
+     */
+    public function addAction(): array
+    {
 
         $file = $this->getRequest()->getFiles('filelink');
-        $result = $this->uploadfilesService->uploadFile($file);
+        try {
+            $result =  $this->uploadfilesService->uploadFile($file, true);
 
-        return $result;
-
+            return [
+                'message' => 'File succesfull uploaded',
+                'success' => true,
+                'file' => $result,
+            ];
+        } catch (fileException $exception) {
+            return [
+                'message' => $exception->customMessage(),
+                'success' => false,
+            ];
+        }
     }
 }
