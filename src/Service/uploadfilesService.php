@@ -3,8 +3,9 @@
 namespace UploadFiles\Service;
 
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use UploadFiles\Exception\fileException;
 
-class fileService implements fileServiceInterface {
+class uploadfilesService {
 
     protected $config;
     protected $mimeType;
@@ -40,7 +41,7 @@ class fileService implements fileServiceInterface {
         $this->fileSize = $file['size']; //file size
         //Check if there is a error in the file
         if ($this->errorNr <> 0) {
-            return "Return Code: " . $this->errorNr . "<br>";
+            return new fileException('Error uploading the file: ' . $this->errorNr);
         }
         //Check if the mime type of the file is allowed by the settings array
         if ($allowedExtensions != NULL) {

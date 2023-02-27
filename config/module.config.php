@@ -11,9 +11,11 @@ return [
     'controllers' => [
         'factories' => [
             Controller\UploadFilesController::class => Factory\UploadFilesControllerFactory::class,
+            Controller\UploadFilesAjaxController::class => Factory\UploadFilesAjaxControllerFactory::class,
         ],
         'aliases' => [
             'uploadfilesbeheer' => Controller\UploadFilesController::class,
+            'uploadfilesajax' => Controller\UploadFilesAjaxController::class,
         ],
     ],
     'service_manager' => [
@@ -38,6 +40,20 @@ return [
                     ],
                 ],
             ],
+            'uploadfilesajax' => [
+                'type' => 'segment',
+                'options' => [
+                    'route' => '/uploadfilesajax[/:action][/:id]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ],
+                    'defaults' => [
+                        'controller' => 'uploadfilesajax',
+                        'action' => 'add',
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [
@@ -52,6 +68,10 @@ return [
             'uploadfilesbeheer' => [
                 // to anyone.
                 ['actions' => '*', 'allow' => '+uploadfiles.manage']
+            ],
+            'uploadfilesajax' => [
+                // to anyone.
+                ['actions' => '*', 'allow' => '*']
             ],
         ]
     ],
