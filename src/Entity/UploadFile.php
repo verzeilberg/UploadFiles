@@ -11,7 +11,7 @@ use Application\Model\UnityOfWork;
  * @ORM\Entity()
  * @ORM\Table(name="file")
  */
-class UploadFiles extends UnityOfWork {
+class UploadFile extends UnityOfWork {
 
     /**
      * @ORM\Id

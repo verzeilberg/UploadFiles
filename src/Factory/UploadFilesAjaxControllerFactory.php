@@ -14,12 +14,22 @@ use UploadFiles\Service\uploadfilesService;
  */
 class UploadFilesAjaxControllerFactory implements FactoryInterface {
 
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null) {
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        array $options = null
+    ): UploadFilesAjaxController
+    {
         
-        $entityManager = $container->get('doctrine.entitymanager.orm_default');
-        $vhm = $container->get('ViewHelperManager');
-        $uploadfilesService = new uploadfilesService($entityManager);
-        return new UploadFilesAjaxController($vhm, $entityManager, $uploadfilesService);
+        $entityManager      = $container->get('doctrine.entitymanager.orm_default');
+        $vhm                = $container->get('ViewHelperManager');
+        $config             = $container->get('config');
+        $uploadFilesService = new uploadfilesService($config);
+        return new UploadFilesAjaxController(
+            $vhm,
+            $entityManager,
+            $uploadFilesService
+        );
     }
 
 }

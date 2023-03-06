@@ -3,6 +3,7 @@
 namespace UploadFiles\Service;
 
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Symfony\Component\VarDumper\VarDumper;
 use UploadFiles\Exception\fileException;
 
 class uploadfilesService {
@@ -13,6 +14,7 @@ class uploadfilesService {
     protected $tempFileName;
     protected $errorNr;
     protected $fileSize;
+    protected $documentRoot;
 
     public function __construct($config) {
         $this->config = $config;
@@ -37,6 +39,7 @@ class uploadfilesService {
         $this->tempFileName = $file['tmp_name']; //temporary file name
         $this->errorNr = $file['error']; //error number
         $this->fileSize = $file['size']; //file size
+        $this->documentRoot = $_SERVER['DOCUMENT_ROOT'];
         //Check if there is an error in the file
         if ($this->errorNr !== 0) {
             return new fileException('Error uploading the file: ' . $this->errorNr);
@@ -56,26 +59,29 @@ class uploadfilesService {
         }
 
         //Set settings in variables
-        $destinationFolder = $this->config['filesUploadSettings'][$fileUploadSettingsKey]['uploadFolder'];
+        $destinationFolder = $this->documentRoot . $this->config['filesUploadSettings'][$fileUploadSettingsKey]['uploadFolder'];
         $maxFileSize = (int) $this->config['filesUploadSettings'][$fileUploadSettingsKey]['uploadeFileSize'];
         $allowedExtensions = $this->config['filesUploadSettings'][$fileUploadSettingsKey]['allowedFileExtensions'];
 
         //Check if the mime type of the file is allowed by the settings array
         //Check if the file is allowed
-        if (($allowedExtensions !== null) && !in_array($this->mimeType, $allowedExtensions, true)) {
-            return 'File extension not allowed';
+        if ((!empty($allowedExtensions) && $allowedExtensions !== null) && !in_array($this->mimeType, $allowedExtensions, true)) {
+            throw new fileException( 'File extension not allowed');
         }
         // Check if the directory exist
         if (!is_dir($destinationFolder)) {
-            return 'Folder ' . $destinationFolder . ' does not exist';
+
+           $result = mkdir($destinationFolder, 0777, true);
+            VarDumper::dump($destinationFolder);
+            VarDumper::dump($result); die;
+
+        } elseif (!is_writable($destinationFolder)) {
+            chmod($destinationFolder, 0777);
         }
-        // Check if the directory has the appropiate rights
-        if (substr(sprintf('%o', fileperms($destinationFolder)), -4) <> '0777') {
-            return 'The folder does not has the appropirate rights to upload files.';
-        }
+
         // Check is the file size is not to big
         if ($this->fileSize > $maxFileSize) {
-            return 'The file size is to big.';
+            throw new fileException( 'The file size is to big.');
         }
         //Convert file name to smal and friendly letters
         $this->fileName = $this->friendlyFileURL($this->fileName);
@@ -96,14 +102,15 @@ class uploadfilesService {
         //Create filename
         $this->fileName = $pathParts['filename'] . $uniqueFileName . '.' . $pathParts['extension'];
         //Create path (including file name)
-        $this->pathToFile = $destinationFolder . "/" . $this->fileName;
+        $this->pathToFile = $destinationFolder . $this->fileName;
         //Upload file to server
-        move_uploaded_file($this->tempFileName, $this->pathToFile);
+        $result = move_uploaded_file($this->tempFileName, $this->pathToFile);
         //Return array
         return [
             'path' => $this->pathToFile,
             'name' => $pathParts['filename'],
-            'type' => $pathParts['extension']
+            'type' => $pathParts['extension'],
+            'result' => $result,
         ];
     }
 

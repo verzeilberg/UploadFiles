@@ -28,7 +28,11 @@ class UploadFilesAjaxController extends AbstractActionController {
 
         $file = $this->getRequest()->getFiles('filelink');
         try {
-            $result =  $this->uploadfilesService->uploadFile($file, true);
+            $result =  $this->uploadfilesService->uploadFile($file, true, 'blog');
+
+            if ($result['result']) {
+
+            }
 
             return [
                 'message' => 'File succesfull uploaded',
@@ -36,6 +40,7 @@ class UploadFilesAjaxController extends AbstractActionController {
                 'file' => $result,
             ];
         } catch (fileException $exception) {
+
             return [
                 'message' => $exception->customMessage(),
                 'success' => false,
