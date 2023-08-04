@@ -55,7 +55,7 @@ class uploadfilesService {
          * @return void
          */
         if (!array_key_exists($fileUploadSettingsKey, $fileUploadSettings)) {
-            throw new fileException('Given settings does not exists');
+            throw new fileException(sprintf('Given settings, %s, does not exists in the config file', $fileUploadSettingsKey));
         }
 
         //Set settings in variables
@@ -65,16 +65,12 @@ class uploadfilesService {
 
         //Check if the mime type of the file is allowed by the settings array
         //Check if the file is allowed
-        if ((!empty($allowedExtensions) && $allowedExtensions !== null) && !in_array($this->mimeType, $allowedExtensions, true)) {
+        if ((!empty($allowedExtensions)) && !in_array($this->mimeType, $allowedExtensions, true)) {
             throw new fileException( 'File extension not allowed');
         }
         // Check if the directory exist
         if (!is_dir($destinationFolder)) {
-
            $result = mkdir($destinationFolder, 0777, true);
-            VarDumper::dump($destinationFolder);
-            VarDumper::dump($result); die;
-
         } elseif (!is_writable($destinationFolder)) {
             chmod($destinationFolder, 0777);
         }
